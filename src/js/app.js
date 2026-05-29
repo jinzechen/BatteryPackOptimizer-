@@ -298,3 +298,65 @@ export async function initApp() {
   await loadSaved();
   bindEvents();
 }
+
+// ========== AI Agent 集成 ==========
+import { aiAgent } from './ai-agent.js';
+import { aiUI } from './ai-ui.js';
+
+// 初始化 AI
+document.addEventListener('DOMContentLoaded', () => {
+  aiUI.init();
+});
+
+// 拦截优化按钮，添加 AI 辅助
+const originalRun = window.runOptimization;
+if (typeof originalRun === 'function') {
+  window.runOptimization = async function (...args) {
+    const result = originalRun.apply(this, args);
+
+    if (aiAgent.isConfigured() && aiAgent.config.autoOptimize) {
+      try {
+        aiUI.showLoading('AI is analyzing optimization results...');
+        const aiResult = await aiAgent.optimizeWithAI(
+          getOptimizationParams(),
+          result
+        );
+        aiUI.showOptimizationResult(aiResult, getOptimizationParams(), result);
+      } catch (e) {
+        console.warn('AI optimization failed:', e);
+      }
+    }
+
+    return result;
+  };
+}
+
+function getOptimizationParams() {
+  // 从页面表单获取当前参数
+  const params = {};
+  document.querySelectorAll('input, select').forEach(el => {
+    if (el.name || el.id) {
+      params[el.name || el.id] = el.value;
+    }
+  });
+  return params;
+}
+
+// 全局暴露 AI 优化入口
+window.runAIOptimization = async function () {
+  if (!aiAgent.isConfigured()) {
+    aiUI._togglePanel('settings');
+    aiUI._toast('Please configure AI first', true);
+    return;
+  }
+
+  try {
+    aiUI.showLoading('AI is analyzing your battery pack design...');
+    const params = getOptimizationParams();
+    const currentResult = window.lastOptimizationResult || {};
+    const aiResult = await aiAgent.optimizeWithAI(params, currentResult);
+    aiUI.showOptimizationResult(aiResult, params, currentResult);
+  } catch (e) {
+    aiUI._toast(`AI Error: ${e.message}`, true);
+  }
+};
