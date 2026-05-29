@@ -141,7 +141,7 @@ export class AIAgent {
     const prompt = `你是一个电池包优化专家系统的学习模块。
 
 以下是用户对最近优化结果的反馈记录：
-${JSON.stringify(recentFeedback, null: 2)}
+${JSON.stringify(recentFeedback, null, 2)}
 
 已有 Skills：
 ${this.skills.map((s, i) => `${i + 1}. [${s.category}] ${s.rule} (命中 ${s.hits} 次, 置信度 ${(s.confidence * 100).toFixed(0)}%)`).join('\n')}
@@ -334,7 +334,7 @@ ${JSON.stringify(currentResult, null, 2)}
 5. 明确标注修改了哪些参数以及修改原因`;
 
     const userPrompt = `当前算法核心参数：
-${JSON.stringify(currentAlgo, null: 2)}
+${JSON.stringify(currentAlgo, null, 2)}
 
 活跃 Skills（按命中次数排序）：
 ${this.skills
