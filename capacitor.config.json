@@ -1,0 +1,20 @@
+{
+  "appId": "com.batteryoptimizer.app",
+  "appName": "锂电排布优化",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchAutoHide": true,
+      "launchShowDuration": 1500,
+      "backgroundColor": "#0c0e14",
+      "showSpinner": false
+    },
+    "StatusBar": {
+      "style": "DARK",
+      "backgroundColor": "#0c0e14"
+    }
+  }
+}

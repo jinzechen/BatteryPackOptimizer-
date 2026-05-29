@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0c0e14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<title>锂电排布优化</title>
+<script type="module" src="/src/main.js"></script>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-left">
+    <button class="hdr-btn" id="btnMenu" aria-label="参数面板">☰</button>
+    <div class="hdr-title">
+      <h1>锂电排布优化</h1>
+      <span class="hdr-sub">Ternary Cell Pack Optimizer</span>
+    </div>
+  </div>
+  <div class="hdr-actions">
+    <button class="hdr-btn" id="btnCam" title="拍照识别电芯">📷</button>
+    <button class="hdr-btn" id="btnExport" title="导出方案">💾</button>
+    <button class="hdr-btn accent" id="btnCalc">▶ 优化</button>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- 参数面板 -->
+  <aside class="panel" id="panel">
+    <div class="panel-inner">
+
+      <!-- 电池仓 -->
+      <section class="pg" data-group="comp">
+        <div class="pg-hdr"><span>📦</span> 电池仓参数 <b>▾</b></div>
+        <div class="pg-body">
+          <div class="fr">
+            <label>电池仓外形尺寸 (mm)</label>
+            <div class="fr3">
+              <div><input id="comp-L" type="number" value="400" inputmode="decimal"><small>长</small></div>
+              <div><input id="comp-W" type="number" value="200" inputmode="decimal"><small>宽</small></div>
+              <div><input id="comp-H" type="number" value="220" inputmode="decimal"><small>高</small></div>
+            </div>
+          </div>
+          <div class="fr">
+            <label>外壳厚度 (mm)</label>
+            <input id="shell-t" type="number" value="1" step="0.1" inputmode="decimal">
+            <small class="hint">默认1mm不锈钢</small>
+          </div>
+        </div>
+      </section>
+
+      <!-- 电芯 -->
+      <section class="pg" data-group="cell">
+        <div class="pg-hdr"><span>🔋</span> 电芯参数 <b>▾</b></div>
+        <div class="pg-body">
+          <div class="fr">
+            <label>预设型号</label>
+            <select id="cell-preset"></select>
+          </div>
+          <div class="fr">
+            <label>电芯尺寸 (mm)</label>
+            <div class="fr3">
+              <div><input id="cell-L" type="number" value="173.9" step="0.1" inputmode="decimal"><small>长</small></div>
+              <div><input id="cell-W" type="number" value="71.7" step="0.1" inputmode="decimal"><small>宽</small></div>
+              <div><input id="cell-H" type="number" value="207.2" step="0.1" inputmode="decimal"><small>高</small></div>
+            </div>
+          </div>
+          <div class="fr2">
+            <div class="fr">
+              <label>容量 (Ah)</label>
+              <input id="cell-ah" type="number" value="280" inputmode="decimal">
+            </div>
+            <div class="fr">
+              <label>标称电压 (V)</label>
+              <input id="cell-v" type="number" value="3.7" step="0.05" inputmode="decimal">
+            </div>
+          </div>
+          <div class="fr">
+            <label>串联数 (S)</label>
+            <input id="series-count" type="number" value="16" min="1" max="200" inputmode="numeric">
+          </div>
+        </div>
+      </section>
+
+      <!-- 保护板 -->
+      <section class="pg" data-group="bms">
+        <div class="pg-hdr"><span>🖥</span> 保护板 <b>▾</b></div>
+        <div class="pg-body">
+          <div class="fr">
+            <label>保护板尺寸 (mm)</label>
+            <div class="fr3">
+              <div><input id="bms-L" type="number" value="150" inputmode="decimal"><small>长</small></div>
+              <div><input id="bms-W" type="number" value="60" inputmode="decimal"><small>宽</small></div>
+              <div><input id="bms-H" type="number" value="15" inputmode="decimal"><small>高</small></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 辅料 -->
+      <section class="pg" data-group="aux">
+        <div class="pg-hdr"><span>🔧</span> 辅料参数 <b>▾</b></div>
+        <div class="pg-body">
+          <div class="fr2">
+            <div class="fr"><label>环氧板厚度</label><input id="epoxy-t" type="number" value="0.5" step="0.1" inputmode="decimal"></div>
+            <div class="fr"><label>连接片厚度</label><input id="tab-t" type="number" value="0.3" step="0.05" inputmode="decimal"></div>
+          </div>
+          <div class="fr2">
+            <div class="fr"><label>铜铝复合片</label><input id="composite-t" type="number" value="0.5" step="0.1" inputmode="decimal"></div>
+            <div class="fr"><label>散热间距</label><input id="cell-gap" type="number" value="1" step="0.5" inputmode="decimal"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 硅胶线 -->
+      <section class="pg" data-group="wire">
+        <div class="pg-hdr"><span>🔌</span> 硅胶线 <b>▾</b></div>
+        <div class="pg-body">
+          <div class="fr">
+            <label>规格</label>
+            <select id="wire-gauge">
+              <option value="AWG10">10AWG (5.26mm²)</option>
+              <option value="AWG8">8AWG (8.37mm²)</option>
+              <option value="6mm2">6mm² (6平)</option>
+              <option value="10mm2">10mm² (10平)</option>
+              <option value="16mm2">16mm² (16平)</option>
+              <option value="25mm2" selected>25mm² (25平)</option>
+              <option value="35mm2">35mm² (35平)</option>
+              <option value="50mm2">50mm² (50平)</option>
+              <option value="70mm2">70mm² (70平)</option>
+              <option value="95mm2">95mm² (95平)</option>
+            </select>
+          </div>
+          <div class="fr2">
+            <div class="fr">
+              <label>出线方向</label>
+              <select id="wire-exit">
+                <option value="top">顶部</option>
+                <option value="side">侧面</option>
+                <option value="end">端部</option>
+              </select>
+            </div>
+            <div class="fr"><label>出线数量</label><input id="wire-count" type="number" value="2" min="1" max="10" inputmode="numeric"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 操作按钮 -->
+      <div class="panel-btns">
+        <button class="btn primary full" id="btnCalc2">▶ 开始优化排布</button>
+        <button class="btn full" id="btnSeries">🔢 查看串号标记</button>
+        <button class="btn full" id="btnCompare">⚡ 多型号并行推算</button>
+      </div>
+
+    </div>
+  </aside>
+
+  <!-- 可视化区 -->
+  <section class="viz">
+    <div class="viz-tabs">
+      <button class="vtab active" data-view="2d">📐 2D平面</button>
+      <button class="vtab" data-view="3d">🧊 3D视图</button>
+      <button class="vtab" data-view="compare">📊 对比</button>
+      <span class="viz-info" id="vizInfo">等待计算</span>
+    </div>
+    <div class="viz-wrap" id="vizWrap">
+      <canvas id="c2d"></canvas>
+      <div id="c3d" class="viz-3d"></div>
+      <div id="comparePanel" class="viz-compare"></div>
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <span>正在优化排布方案...</span>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- 结果栏 -->
+<footer class="res-bar" id="resBar">
+  <div class="rc"><h4>排布</h4><div class="rv" id="rLay">--</div><small id="rLayD">等待计算</small></div>
+  <div class="rc"><h4>利用率</h4><div class="rv" id="rUtil">--</div><small id="rUtilD">--</small></div>
+  <div class="rc"><h4>走线</h4><div class="rv" id="rWire">--</div><small id="rWireD">--</small></div>
+  <div class="rc"><h4>电池组</h4><div class="rv" id="rPack">--</div><small id="rPackD">--</small></div>
+  <div class="rc"><h4>校验</h4><div class="rv" id="rFit">--</div><small id="rFitD">--</small></div>
+</footer>
+
+<!-- 串号模态框 -->
+<div class="modal-bg" id="modalSeries">
+  <div class="modal">
+    <h3>串联路径标记（总正 → 总负）</h3>
+    <div class="sflow" id="sFlow"></div>
+    <button class="btn" onclick="document.getElementById('modalSeries').classList.remove('open')">关闭</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+</body>
+</html>
